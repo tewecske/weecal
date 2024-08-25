@@ -3,17 +3,17 @@ package handlers
 import (
 	b64 "encoding/base64"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"time"
 	"weecal/internal/hash"
 	"weecal/internal/store/session"
 	"weecal/internal/store/user"
 	"weecal/web/templates"
-	"log/slog"
-	"net/http"
-	"time"
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	Render(w, r, templates.Login())
+	Render(w, r, templates.Login(), "Login")
 }
 
 func HandlePostLogin(
@@ -75,6 +75,5 @@ func HandlePostLogin(
 
 		w.Header().Set("HX-Redirect", "/")
 		w.WriteHeader(http.StatusOK)
-		Render(w, r, templates.Login())
 	}
 }

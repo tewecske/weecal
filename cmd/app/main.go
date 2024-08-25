@@ -3,6 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	project "weecal"
 	"weecal/internal/config"
 	"weecal/internal/handlers"
@@ -10,12 +16,6 @@ import (
 	m "weecal/internal/middleware"
 	database "weecal/internal/store/db"
 	"weecal/internal/store/session"
-	"log/slog"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -102,6 +102,8 @@ func main() {
 		r.Post("/logout", handlers.Make(handlers.HandlePostLogout(
 			cfg.SessionCookieName,
 		)))
+
+		r.Get("/calendar", handlers.Make(handlers.HandleCalendar))
 	})
 	// slog.Info("HTTP server started", "listenAddr", cfg.Port)
 	// http.ListenAndServe(cfg.Port, router)

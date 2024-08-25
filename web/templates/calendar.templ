@@ -1,0 +1,72 @@
+package templates
+
+templ Calendar(days []string, hours []string) {
+<div class="w-full h-[40rem] overflow-hidden">
+    <!-- <div class="container flex justify-items-center mx-auto"> -->
+    <!-- ====== Calendar Section Start -->
+    <!-- <div class="w-full max-w-ful h-3/4 overflow-hidden"> -->
+    <div
+        class="w-[90%] mx-auto h-full max-w-full rounded-sm overflow-auto scrollbar-thin shadow-default dark:border-strokedark dark:bg-boxdark">
+        <table class="w-full table table-zebra table-fixed border-collapse border">
+            <thead>
+                <tr class="rounded-t-sm sticky top-0 z-10 bg-neutral text-neutral-content">
+                    <th
+                        class="w-20 h-15 z-10 border border-stroke bg-base text-base-content items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="block">Hours</span>
+                    </th>
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="hidden lg:block text-center">{ days[0] }</span>
+                        <span class="block lg:hidden text-center">{ days[0] }</span>
+                    </th>
+                    for _, day := range days[1:6] {
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="hidden lg:block text-center">{ day }</span>
+                        <span class="block lg:hidden text-center">{ day }</span>
+                    </th>
+                    }
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center rounded-tr-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="hidden lg:block text-center">{ days[len(days)-1] }</span>
+                        <span class="block lg:hidden text-center">{ days[len(days)-1] }</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                for _, hour := range hours {
+                <tr class="bg-base-100">
+                    <td
+                        class="relative h-10 border border-stroke items-center justify-center dark:border-strokedark md:h-15 xl:h-21">
+                        <span class="block text-center font-medium text-black dark:text-white"> { hour } </span>
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-15 md:p-6 xl:h-21">
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- ====== Calendar Section End -->
+    <!-- </div> -->
+</div>
+}
