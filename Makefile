@@ -7,6 +7,8 @@ build:
 	@echo -n 'web/public/htmx.min.js sha256-'; cat web/public/htmx.min.js | openssl sha256 -binary | openssl base64
 	@test -f web/public/response-targets.js || wget -q -O web/public/response-targets.js https://unpkg.com/htmx-ext-response-targets@2.0.0/response-targets.js
 	@echo -n 'web/public/response-targets.js sha256-'; cat web/public/response-targets.js | openssl sha256 -binary | openssl base64
+	@test -f web/public/alpine.js || wget -q -O web/public/alpine.js https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js
+	@echo -n 'web/public/alpine.js sha256-'; cat web/public/alpine.js | openssl sha256 -binary | openssl base64
 	@go build -tags dev -o bin/app cmd/app/main.go
 
 .PHONY: templ

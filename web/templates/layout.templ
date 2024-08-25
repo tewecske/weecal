@@ -14,8 +14,11 @@ templ header(title string) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--script src="https://unpkg.com/htmx.org@2.0.1" defer></script -->
     <script src="/static/public/htmx.min.js" integrity="sha256-bUqqSw0+i0yR+Nl7kqNhoZsb1FRN6j9mj9w+YqY5ld8="></script>
-    <script src="static/public/response-targets.js"
+    <script src="/static/public/response-targets.js"
         integrity="sha256-EtDJKiu1jHe6jtwOCABcdSkppIaCP/+vBbsOPG/numY="></script>
+    <script src="/static/public/weecal.js" nonce={ secure.CSPNonce(ctx) } defer></script>
+    <script src="/static/public/alpine.js" integrity="sha256-NY2a+7GrW++i9IBhowd25bzXcH9BCmBrqYX5i8OxwDQ="
+        defer></script>
     if os.Getenv("env") == "production" {
     <link rel="stylesheet" href="/static/public/styles.css" nonce={ secure.CSPNonce(ctx) } />
     <!-- link rel="stylesheet" href="static/css/style.min.css" nonce={ middleware.GetTwNonce(ctx) }/ -->
