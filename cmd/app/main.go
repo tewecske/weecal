@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -72,6 +73,8 @@ func main() {
 		IsDevelopment: project.IsDevelopment, // This will cause the AllowedHosts, SSLRedirect, and STSSeconds/STSIncludeSubdomains options to be ignored during development. When deploying to production, be sure to set this to false.
 	})
 
+	fmt.Println(secureMiddleware)
+
 	authMiddleware := m.NewAuthMiddleware(dbAccess.SessionStore, cfg.SessionCookieName)
 
 	router := chi.NewRouter()
@@ -81,7 +84,7 @@ func main() {
 	router.Group(func(r chi.Router) {
 		r.Use(
 			middleware.Logger,
-			secureMiddleware.Handler,
+			// secureMiddleware.Handler,
 			m.TextHTMLMiddleware, // NOTE: it probably won't always be text/html
 			authMiddleware.AddUserToContext,
 		)
@@ -104,6 +107,12 @@ func main() {
 		)))
 
 		r.Get("/calendar", handlers.Make(handlers.HandleCalendar))
+
+		r.Get("/teams/create", handlers.Make(handlers.HandleCreateTeam))
+
+		r.Get("/teams", handlers.Make(handlers.HandleListTeams(
+			dbAccess.TeamStore,
+		)))
 	})
 	// slog.Info("HTTP server started", "listenAddr", cfg.Port)
 	// http.ListenAndServe(cfg.Port, router)

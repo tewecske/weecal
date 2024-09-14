@@ -1,0 +1,94 @@
+package templates
+
+import (
+"fmt"
+"weecal/internal/store/team"
+)
+
+templ ListTeams(teams []team.Team) {
+<div class="w-full h-[40rem] overflow-hidden">
+    <div
+        class="w-[90%] mx-auto h-full max-w-full rounded-sm overflow-auto scrollbar-thin shadow-default dark:border-strokedark dark:bg-boxdark">
+        <table class="w-full table table-zebra table-fixed border-collapse border">
+            <thead>
+                <tr class="rounded-t-sm sticky top-0 z-10 bg-neutral text-neutral-content">
+                    <th
+                        class="w-20 h-15 z-10 border border-stroke bg-base text-base-content items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="block text-center">ID</span>
+                    </th>
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="block text-center">Name</span>
+                    </th>
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="block text-center">Short Name</span>
+                    </th>
+                    <th
+                        class="h-15 z-10 border border-stroke items-center justify-center rounded-tr-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
+                        <span class="block text-center">Actions</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="teams-table-body">
+                for _, team := range teams {
+                <tr class="bg-base-100">
+                    <td
+                        class="relative h-10 border border-stroke items-center justify-center dark:border-strokedark md:h-15 xl:h-21">
+                        <span class="block text-center font-medium text-black dark:text-white"> { fmt.Sprint(team.ID)
+                            } </span>
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21">
+                        <span class="block text-center">{ team.Name }</span>
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21">
+                        <span class="block text-center">{ team.ShortName }</span>
+                    </td>
+                    <td
+                        class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21">
+                        <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID)} hx-target="#modal"
+                            hx-trigger="click">View</button>
+                        <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID) + "/edit" }
+                            hx-target="#modal" hx-trigger="click">Modify</button>
+                        <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID) + "/delete" }
+                            hx-target="#modal" hx-trigger="click">Delete</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <button class="btn" hx-get="/teams/create" hx-target="#teams-table-body" hx-swap="outerHTML"
+            hx-trigger="click">Create Team</button>
+
+
+        <!-- Open the modal using ID.showModal() method -->
+        <button class="btn" onclick="my_modal_2.showModal()">open modal</button>
+        <dialog id="my_modal_2" class="modal">
+            <div class="modal-box p-6 bg-sky-50 max-w-96 max-h-48">
+                <h3 class="text-lg font-bold">Hello!</h3>
+                <p class="py-4">Press ESC key or click outside to close</p>
+            </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
+    </div>
+</div>
+}
+
+templ CreateTeam() {
+<div class="modal">
+    <form hx-post="/teams" hx-target="#modal">
+        <input type="text" name="name" placeholder="Name" />
+        <input type="text" name="shortName" placeholder="Short Name" />
+        <button type="submit">Create</button>
+        <button hx-get="/teams" hx-target="#modal">Cancel</button>
+    </form>
+</div>
+}
+
+templ TeamsError() {
+<p class="text-error">Teams error</p>
+}

@@ -1,11 +1,12 @@
 package db
 
 import (
-	"weecal/internal/hash"
-	"weecal/internal/store/session"
-	"weecal/internal/store/user"
 	"log/slog"
 	"os"
+	"weecal/internal/hash"
+	"weecal/internal/store/session"
+	"weecal/internal/store/team"
+	"weecal/internal/store/user"
 
 	"context"
 	"database/sql"
@@ -22,6 +23,7 @@ type DBAccess struct {
 	DB           *sqlx.DB
 	UserStore    user.UserStore
 	SessionStore session.SessionStore
+	TeamStore    team.TeamStore
 }
 
 func SetupDB(dbName string, passwordHash hash.PasswordHash) *DBAccess {
@@ -36,10 +38,15 @@ func SetupDB(dbName string, passwordHash hash.PasswordHash) *DBAccess {
 		DB: db,
 	})
 
+	teamStore := team.NewTeamStore(team.NewTeamStoreParams{
+		DB: db,
+	})
+
 	return &DBAccess{
 		DB:           db,
 		UserStore:    userStore,
 		SessionStore: sessionStore,
+		TeamStore:    teamStore,
 	}
 }
 
@@ -81,6 +88,12 @@ func Connect(dbName string) *sqlx.DB {
 		panic(err)
 	}
 	slog.Info("Session schema creation result", "sessionResult", sessionResult)
+
+	teamResult, err := db.MustExec(team.TeamSchema).LastInsertId()
+	if err != nil {
+		panic(err)
+	}
+	slog.Info("Team schema creation result", "teamResult", teamResult)
 
 	return db
 }
