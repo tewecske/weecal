@@ -3,6 +3,9 @@
 
  FIX: use the same logger everywhere
 
+ TODO: Use templ.Render
+ TODO: Use layout in templ files instead of the custom Render function (see above)
+
  TODO: add logout toast
  TODO: add google login
  TODO: add remember me
@@ -15,7 +18,6 @@
 
  HACK:
 
- NOTE: need easy replace of "weecal"
  NOTE: NewUser generates the password and saves to DB as well, maybe separate it
 
  BUG:

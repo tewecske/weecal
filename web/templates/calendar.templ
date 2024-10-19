@@ -39,7 +39,7 @@ templ Calendar(days []string, hours []string) {
                     </td>
                     <td class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21"
                         x-on:drop.prevent="dropDragged" x-on:dragover.prevent="{}">
-                        if hour == "03:00" {
+                        if hour == "09:00" {
                         <div id="item-1" class="group w-full flex-grow cursor-grab" x-on:dragstart.self="dragStart"
                             x-on:dragend="dragEnd" x-data="draggable" draggable="true">
                             <div
@@ -56,6 +56,26 @@ templ Calendar(days []string, hours []string) {
                     </td>
                     <td class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21"
                         x-on:drop.prevent="dropDragged" x-on:dragover.prevent="{}">
+                        if hour == "09:00" {
+                        <div id="item-2" class="group w-full flex-grow cursor-grab" x-on:dragstart.self="dragStart"
+                            x-on:dragend="dragEnd" x-data="draggable" draggable="true">
+                            <div
+                                class="absolute top-2 left-2 z-50 mb-1 flex flex-wrap rounded-sm border-l-[3px] border-primary bg-gray-700 hover:bg-gray-500 hover:cursor-grab px-3 py-1 text-left dark:bg-meta-4 visible w-[90%] h-[190%] opacity-100">
+                                <span
+                                    class="w-1/2 event-name bg-green-500 text-sm font-semibold text-black dark:text-white">
+                                    Gym
+                                </span>
+                                <span
+                                    class="w-1/2 event-name bg-green-600 text-sm font-semibold text-black dark:text-white">
+                                    Per
+                                </span>
+                                <span
+                                    class="w-full event-name bg-green-700 text-sm font-semibold text-black dark:text-white">
+                                    U10 - 60x40
+                                </span>
+                            </div>
+                        </div>
+                        }
                     </td>
                     <td class="ease relative h-10 cursor-pointer border border-stroke p-1 transition duration-500 hover:bg-gray-600 dark:border-strokedark dark:hover:bg-meta-4 md:h-15 xl:h-21"
                         x-on:drop.prevent="dropDragged" x-on:dragover.prevent="{}">

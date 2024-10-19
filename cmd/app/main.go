@@ -108,9 +108,13 @@ func main() {
 
 		r.Get("/calendar", handlers.Make(handlers.HandleCalendar))
 
-		r.Get("/teams/create", handlers.Make(handlers.HandleCreateTeam))
+		r.Get("/teams/create", handlers.Make(handlers.HandleCreateTeamView()))
 
 		r.Get("/teams", handlers.Make(handlers.HandleListTeams(
+			dbAccess.TeamStore,
+		)))
+
+		r.Post("/teams", handlers.Make(handlers.HandleCreateTeam(
 			dbAccess.TeamStore,
 		)))
 	})

@@ -35,15 +35,16 @@ func (s *SQLTeamStore) ListTeams() ([]Team, error) {
 		slog.Info("Error listing teams", "err", err)
 		return nil, err
 	}
+	slog.Info("Got teams from databse", "teams", teams)
 
 	return teams, nil
 }
 
-func (s *SQLTeamStore) CreateTeam(team *Team) error {
+func (s *SQLTeamStore) CreateTeam(team Team) error {
 
 	result, err := s.db.NamedExec(`INSERT INTO teams (name, short_name) VALUES (:name, :short_name);`, map[string]interface{}{
-		"name":    team.Name,
-		"user_id": team.ShortName,
+		"name":       team.Name,
+		"short_name": team.ShortName,
 	})
 
 	if err != nil {

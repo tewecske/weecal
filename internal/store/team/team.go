@@ -7,6 +7,6 @@ type Team struct {
 }
 
 type TeamStore interface {
-	CreateTeam(team *Team) error
+	CreateTeam(team Team) error
 	ListTeams() ([]Team, error)
 }
