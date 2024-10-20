@@ -1,0 +1,20 @@
+package components
+
+type InputParams struct {
+	ID          string
+	Name        string
+	Label       string
+	InputType   string
+	Placeholder string
+	Value       string
+	Error       string
+	Attributes  templ.Attributes
+}
+
+templ Input(params InputParams) {
+	<label for={ params.Name }>{ params.Label }</label>
+	<input type="text" name={ params.Name } placeholder={ params.Placeholder } class="input input-bordered block w-full" value={ params.Value }/>
+	if params.Error != "" {
+		<p id={ params.ID } class="text-red-500">{ params.Error }</p>
+	}
+}

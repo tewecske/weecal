@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"weecal/internal/store/team"
+	"weecal/web/templates/components"
 )
 
 templ listTeamsComponent(teams []team.Team) {
@@ -115,18 +116,26 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 	<div id="create-team" class="">
 		<form hx-post="/teams" class="px-4 my-32 max-w-sm mx-auto space-y-6">
 			<div class="w-full">
-				<label for="name">Name</label>
-				<input type="text" name="name" placeholder="Name" class="input input-bordered block w-full" value={ teamForm.Name }/>
-				if errorText, ok := validationErrors["name"]; ok {
-					<p id="nameError" class="text-red-500">{ errorText }</p>
-				}
+				@components.Input(components.InputParams{
+					ID:          "name",
+					Name:        "name",
+					Label:       "Name",
+					InputType:   "text",
+					Placeholder: "Name",
+					Value:       teamForm.Name,
+					Error:       components.ErrorForField(validationErrors, "name"),
+				})
 			</div>
 			<div class="w-full">
-				<label for="shortName">Short Name</label>
-				<input type="text" name="shortName" placeholder="Short Name" class="input input-bordered block w-full" value={ teamForm.ShortName }/>
-				if errorText, ok := validationErrors["shortName"]; ok {
-					<p id="shortNameError" class="text-red-500">{ errorText }</p>
-				}
+				@components.Input(components.InputParams{
+					ID:          "shortName",
+					Name:        "shortName",
+					Label:       "Short Name",
+					InputType:   "text",
+					Placeholder: "Short Name",
+					Value:       teamForm.ShortName,
+					Error:       components.ErrorForField(validationErrors, "shortName"),
+				})
 			</div>
 			<div class="w-full flex space-x-4">
 				<div class="w-1/2">
