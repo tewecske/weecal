@@ -6,6 +6,12 @@ type Team struct {
 	ShortName string `db:"short_name" json:"shortName"`
 }
 
+type TeamForm struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	ShortName string `json:"shortName"`
+}
+
 type TeamStore interface {
 	CreateTeam(team Team) error
 	ListTeams() ([]Team, error)

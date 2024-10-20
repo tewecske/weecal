@@ -2,6 +2,7 @@
  WARN: remove dummy user
 
  FIX: use the same logger everywhere
+ FIX: Teams create Cancel button target (need ListTeamsComponent)
 
  TODO: Use templ.Render
  TODO: Use layout in templ files instead of the custom Render function (see above)

@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 	"weecal/internal/store/team"
 	"weecal/web/templates"
 
@@ -28,7 +26,7 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hxRequest := r.Header.Get("HX-Request")
 		if hxRequest == "true" {
-			templ.Handler(templates.CreateTeamComponent()).ServeHTTP(w, r)
+			templ.Handler(templates.CreateTeamComponent(team.TeamForm{}, map[string]string{})).ServeHTTP(w, r)
 		} else {
 			templ.Handler(templates.CreateTeam()).ServeHTTP(w, r)
 		}
@@ -36,27 +34,34 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func validateCreateTeam(teamForm team.TeamForm) map[string]string {
+	validationErrors := map[string]string{}
+	if teamForm.Name == "" {
+		validationErrors["name"] = "Missing Name"
+	}
+	if teamForm.ShortName == "" {
+		validationErrors["shortName"] = "Missing Short Name"
+	}
+	return validationErrors
+}
+
 func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var team team.Team
 		r.ParseForm()
-		name := r.FormValue("name")
-		shortName := r.FormValue("shortName")
-		var validationErrors []string = make([]string, 0, 2)
-		if name == "" {
-			validationErrors = append(validationErrors, "Missing Name")
+		teamForm := team.TeamForm{
+			Name:      r.FormValue("name"),
+			ShortName: r.FormValue("shortName"),
 		}
-		if shortName == "" {
-			validationErrors = append(validationErrors, "Missing Short Name")
-		}
+		validationErrors := validateCreateTeam(teamForm)
 		if len(validationErrors) != 0 {
-			errors := strings.Join(validationErrors, ",")
-			http.Error(w, fmt.Sprintf("Validation errors: %s", errors), http.StatusInternalServerError)
+			templ.Handler(templates.CreateTeamComponent(teamForm, validationErrors)).ServeHTTP(w, r)
 			return
 		}
 
-		team.Name = name
-		team.ShortName = shortName
+		team := team.Team{
+			Name:      teamForm.Name,
+			ShortName: teamForm.ShortName,
+		}
 
 		slog.Info("Decoded team from request", "team", team)
 		err := teamStore.CreateTeam(team)
