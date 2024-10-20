@@ -1,105 +1,140 @@
 package templates
 
 import (
-"fmt"
-"weecal/internal/store/team"
+	"fmt"
+	"weecal/internal/store/team"
 )
 
 templ listTeamsComponent(teams []team.Team) {
-<table class="w-full table table-zebra table-fixed border-collapse border">
-    <thead>
-        <tr class="rounded-t-sm sticky top-0 z-10 bg-neutral text-neutral-content">
-            <th
-                class="w-20 h-15 z-10 border border-stroke bg-base text-base-content items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
-                <span class="block text-center">ID</span>
-            </th>
-            <th
-                class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
-                <span class="block text-center">Name</span>
-            </th>
-            <th
-                class="h-15 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-5">
-                <span class="block text-center">Short Name</span>
-            </th>
-            <th
-                class="h-15 z-10 border border-stroke items-center justify-center rounded-tr-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
-                <span class="block text-center">Actions</span>
-            </th>
-        </tr>
-    </thead>
-    <tbody id="teams-table-body">
-        for _, team := range teams {
-        <tr class="bg-base-100">
-            <td
-                class="relative h-10 border border-stroke items-center justify-center dark:border-strokedark md:h-15 xl:h-21">
-                <span class="block text-center font-medium text-black dark:text-white"> { fmt.Sprint(team.ID)
-                    } </span>
-            </td>
-            <td class="relative h-10 border border-stroke p-1 dark:border-strokedark  md:h-15 xl:h-21">
-                <span class="block text-center">{ team.Name }</span>
-            </td>
-            <td class="relative h-10 border border-stroke p-1 dark:border-strokedark md:h-15 xl:h-21">
-                <span class="block text-center">{ team.ShortName }</span>
-            </td>
-            <td class="relative h-10 border border-stroke p-1 dark:border-strokedark md:h-15 xl:h-21">
-                <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID)} hx-target="#modal"
-                    hx-trigger="click">View</button>
-                <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID) + "/edit" } hx-target="#modal"
-                    hx-trigger="click">Modify</button>
-                <button class="btn btn-sm" hx-get={"/teams/" + fmt.Sprint(team.ID) + "/delete" } hx-target="#modal"
-                    hx-trigger="click">Delete</button>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
-<button class="btn" hx-get="/teams/create" hx-target="#teams-content" hx-swap="innerHTML" hx-trigger="click"
-    hx-push-url="true">Create Team</button>
+	<div class="flex justify-between mb-2">
+		<button
+			class="btn block"
+			hx-get="/teams/create"
+			hx-target="#teams-content"
+			hx-swap="innerHTML"
+			hx-trigger="click"
+			hx-push-url="true"
+		>Create Team</button>
+		<input type="text" name="searchTeams" placeholder="Search..." class="input input-bordered block"/>
+	</div>
+	<table class="w-full table table-zebra table-fixed border-collapse border rounded-t-sm">
+		<thead>
+			<tr class="rounded-t-sm sticky top-0 h-10 z-10 bg-neutral text-neutral-content">
+				<th
+					class="w-20 h-10 z-10 border border-stroke bg-base text-base-content items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-base xl:p-2"
+				>
+					<span class="block text-center">ID</span>
+				</th>
+				<th
+					class="h-10 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-2"
+				>
+					<span class="block text-center">Name</span>
+				</th>
+				<th
+					class="h-10 z-10 border border-stroke items-center justify-center p-1 text-xs font-semibold sm:text-base xl:p-2"
+				>
+					<span class="block text-center">Short Name</span>
+				</th>
+				<th
+					class="h-10 z-10 border border-stroke items-center justify-center rounded-tr-sm p-1 text-xs font-semibold sm:text-base xl:p-2"
+				>
+					<span class="block text-center">Actions</span>
+				</th>
+			</tr>
+		</thead>
+		<tbody id="teams-table-body">
+			for _, team := range teams {
+				<tr class="bg-base-100">
+					<td
+						class="relative h-10 border border-stroke items-center justify-center dark:border-strokedark md:h-15 xl:h-21"
+					>
+						<span class="block text-center font-medium text-black dark:text-white">
+							{ fmt.Sprint(team.ID) }
+						</span>
+					</td>
+					<td class="relative h-10 border border-stroke p-1 dark:border-strokedark  md:h-15 xl:h-21">
+						<span class="block text-center">{ team.Name }</span>
+					</td>
+					<td class="relative h-10 border border-stroke p-1 dark:border-strokedark md:h-15 xl:h-21">
+						<span class="block text-center">{ team.ShortName }</span>
+					</td>
+					<td class="relative h-10 border border-stroke p-1 dark:border-strokedark md:h-15 xl:h-21">
+						<button
+							class="btn btn-sm"
+							hx-get={ "/teams/" + fmt.Sprint(team.ID) }
+							hx-target="#modal"
+							hx-trigger="click"
+						>View</button>
+						<button
+							class="btn btn-sm"
+							hx-get={ "/teams/" + fmt.Sprint(team.ID) + "/edit" }
+							hx-target="#modal"
+							hx-trigger="click"
+						>Modify</button>
+						<button
+							class="btn btn-sm"
+							hx-get={ "/teams/" + fmt.Sprint(team.ID) + "/delete" }
+							hx-target="#modal"
+							hx-trigger="click"
+						>Delete</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
 
+templ teamLayout() {
+	<div id="teams-container" class="w-full h-[40rem] overflow-hidden">
+		<div
+			id="teams-content"
+			class="w-[90%] mx-auto h-full max-w-full rounded-sm overflow-auto scrollbar-thin shadow-default dark:border-strokedark dark:bg-boxdark"
+		>
+			{ children... }
+		</div>
+	</div>
 }
 
 templ ListTeams(teams []team.Team) {
-<div id="teams-container" class="w-full h-[40rem] overflow-hidden">
-    <div id="teams-content"
-        class="w-[90%] mx-auto h-full max-w-full rounded-sm overflow-auto scrollbar-thin shadow-default dark:border-strokedark dark:bg-boxdark">
-        @listTeamsComponent(teams)
-    </div>
-</div>
+	@teamLayout() {
+		@listTeamsComponent(teams)
+	}
 }
 
 templ CreateTeam() {
-<div id="teams-container" class="w-full h-[40rem] overflow-hidden">
-    <div id="teams-content"
-        class="w-[90%] mx-auto h-full max-w-full rounded-sm overflow-auto scrollbar-thin shadow-default dark:border-strokedark dark:bg-boxdark">
-        @CreateTeamComponent()
-    </div>
-</div>
+	@teamLayout() {
+		@CreateTeamComponent()
+	}
 }
 
 templ CreateTeamComponent() {
-<div id="create-team" class="">
-    <form hx-post="/teams" hx-target="#teams-content" class="px-4 my-32 max-w-sm mx-auto space-y-6">
-        <div class="w-full">
-            <label for="name">Name</label>
-            <input type="text" name="name" placeholder="Name" class="input input-bordered block w-full" />
-        </div>
-        <div class="w-full">
-            <label for="shortName">Short Name</label>
-            <input type="text" name="shortName" placeholder="Short Name" class="input input-bordered block w-full" />
-        </div>
-        <div class="w-full flex space-x-4">
-            <div class="w-1/2">
-                <button type="submit" class="btn block w-full">Create</button>
-            </div>
-            <div class="w-1/2">
-                <button hx-get="/teams" hx-target="#teams-container" hx-select="#teams-container"
-                    class="btn block w-full">Cancel</button>
-            </div>
-        </div>
-    </form>
-</div>
+	<div id="create-team" class="">
+		<form hx-post="/teams" hx-target="#teams-content" class="px-4 my-32 max-w-sm mx-auto space-y-6">
+			<div class="w-full">
+				<label for="name">Name</label>
+				<input type="text" name="name" placeholder="Name" class="input input-bordered block w-full"/>
+			</div>
+			<div class="w-full">
+				<label for="shortName">Short Name</label>
+				<input type="text" name="shortName" placeholder="Short Name" class="input input-bordered block w-full"/>
+			</div>
+			<div class="w-full flex space-x-4">
+				<div class="w-1/2">
+					<button type="submit" class="btn block w-full">Create</button>
+				</div>
+				<div class="w-1/2">
+					<button
+						hx-get="/teams"
+						hx-target="#teams-container"
+						hx-select="#teams-container"
+						class="btn block w-full"
+					>Cancel</button>
+				</div>
+			</div>
+		</form>
+	</div>
 }
 
 templ TeamsError() {
-<p class=" text-error">Teams error</p>
+	<p class=" text-error">Teams error</p>
 }
