@@ -7,6 +7,7 @@ import (
 	"weecal/web/templates"
 
 	"github.com/a-h/templ"
+	"github.com/go-chi/chi/v5"
 )
 
 func HandleListTeams(teamStore team.TeamStore) http.HandlerFunc {
@@ -29,6 +30,26 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 			templ.Handler(templates.CreateTeamComponent(team.TeamForm{}, map[string]string{})).ServeHTTP(w, r)
 		} else {
 			templ.Handler(templates.CreateTeam()).ServeHTTP(w, r)
+		}
+
+	}
+}
+
+func HandleViewTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		teamId := chi.URLParam(r, "id")
+		slog.Info("HandleViewTeam", "teamId", teamId)
+		team, err := teamStore.ReadTeam(teamId)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
+		hxRequest := r.Header.Get("HX-Request")
+		if hxRequest == "true" {
+			templ.Handler(templates.ViewTeamComponent(team)).ServeHTTP(w, r)
+		} else {
+			templ.Handler(templates.ViewTeam(team)).ServeHTTP(w, r)
 		}
 
 	}

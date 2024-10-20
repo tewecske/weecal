@@ -63,7 +63,8 @@ templ listTeamsComponent(teams []team.Team) {
 						<button
 							class="btn btn-sm"
 							hx-get={ "/teams/" + fmt.Sprint(team.ID) }
-							hx-target="#modal"
+							hx-target="#viewTeamModal"
+							hx-swap="outerHTML"
 							hx-trigger="click"
 						>View</button>
 						<button
@@ -83,6 +84,7 @@ templ listTeamsComponent(teams []team.Team) {
 			}
 		</tbody>
 	</table>
+	<dialog id="viewTeamModal"></dialog>
 }
 
 templ teamLayout() {
@@ -152,6 +154,36 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 			</div>
 		</form>
 	</div>
+}
+
+templ ViewTeam(team team.Team) {
+	@Layout("Teams") {
+		@teamLayout() {
+			@ViewTeamComponent(team)
+		}
+	}
+}
+
+templ ViewTeamComponent(team team.Team) {
+	<dialog id="viewTeamModal" class="modal">
+		<div class="modal-box px-4 my-32 max-w-sm mx-auto space-y-6">
+			<div class="w-full">
+				<p class="font-bold">Name</p>
+				<p>{ team.Name }</p>
+			</div>
+			<div class="w-full">
+				<p class="font-bold">Short Name</p>
+				<p>{ team.ShortName }</p>
+			</div>
+			<div class="w-full flex space-x-4">
+				<form method="dialog">
+					<div class="w-full">
+						<button class="btn block w-full">Close</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</dialog>
 }
 
 templ TeamsError() {

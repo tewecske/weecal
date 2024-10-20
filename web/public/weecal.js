@@ -20,3 +20,13 @@ document.addEventListener('alpine:init', () => {
     }
   }))
 })
+
+htmx.on("htmx:load", function(evt) {
+  if (htmx.find("#teams-container") !== null) {
+    htmx.on('#teams-container', 'htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'viewTeamModal') {
+            viewTeamModal.showModal();
+        }
+    });
+  }
+});

@@ -17,6 +17,7 @@ import (
 	m "weecal/internal/middleware"
 	database "weecal/internal/store/db"
 	"weecal/internal/store/session"
+	"weecal/internal/store/team"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -36,6 +37,7 @@ func main() {
 	dbAccess.SessionStore.CreateSession(&session.Session{
 		UserID: 1,
 	})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 1, Name: "U10 2010", ShortName: "U10"})
 
 	// TODO: Check: base-uri 'none'; object-src 'none';
 	// TODO: Check: script-src 'strict-dynamic' 'unsafe-inline' 'unsafe-eval'
@@ -111,6 +113,10 @@ func main() {
 		r.Get("/teams/create", handlers.HandleCreateTeamView())
 
 		r.Get("/teams", handlers.HandleListTeams(
+			dbAccess.TeamStore,
+		))
+
+		r.Get("/teams/{id}", handlers.HandleViewTeam(
 			dbAccess.TeamStore,
 		))
 

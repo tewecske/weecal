@@ -1,6 +1,8 @@
 package team
 
 import (
+	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/jmoiron/sqlx"
@@ -35,7 +37,7 @@ func (s *SQLTeamStore) ListTeams() ([]Team, error) {
 		slog.Info("Error listing teams", "err", err)
 		return nil, err
 	}
-	slog.Info("Got teams from databse", "teams", teams)
+	slog.Info("Got teams from database", "teams", teams)
 
 	return teams, nil
 }
@@ -56,4 +58,23 @@ func (s *SQLTeamStore) CreateTeam(team Team) error {
 	slog.Info("Inserting team", "lastId", id)
 
 	return nil
+}
+
+func (s *SQLTeamStore) ReadTeam(id string) (Team, error) {
+	team := Team{}
+	rows, err := s.db.NamedQuery(`SELECT id, name, short_name FROM teams WHERE id=:id;`, map[string]interface{}{
+		"id": id,
+	})
+
+	if err != nil {
+		slog.Info("Error reading teams", "err", err, "id", id)
+		return team, err
+	}
+	if rows.Next() {
+		rows.StructScan(&team)
+		slog.Info("Got team from database", "team", team)
+
+		return team, nil
+	}
+	return team, errors.New(fmt.Sprintf("Error reading team with id: %s", id))
 }
