@@ -89,34 +89,34 @@ func main() {
 			authMiddleware.AddUserToContext,
 		)
 
-		r.NotFound(handlers.Make(handlers.HandleNotFound))
+		r.NotFound(handlers.HandleNotFound())
 
-		r.Get("/", handlers.Make(handlers.HandleHome))
+		r.Get("/", handlers.HandleHome())
 
-		r.Get("/login", handlers.Make(handlers.HandleLogin))
+		r.Get("/login", handlers.HandleLogin())
 
-		r.Post("/login", handlers.Make(handlers.HandlePostLogin(
+		r.Post("/login", handlers.HandlePostLogin(
 			dbAccess.UserStore,
 			dbAccess.SessionStore,
 			passwordHash,
 			cfg.SessionCookieName,
-		)))
+		))
 
-		r.Post("/logout", handlers.Make(handlers.HandlePostLogout(
+		r.Post("/logout", handlers.HandlePostLogout(
 			cfg.SessionCookieName,
-		)))
+		))
 
-		r.Get("/calendar", handlers.Make(handlers.HandleCalendar))
+		r.Get("/calendar", handlers.HandleCalendar())
 
-		r.Get("/teams/create", handlers.Make(handlers.HandleCreateTeamView()))
+		r.Get("/teams/create", handlers.HandleCreateTeamView())
 
-		r.Get("/teams", handlers.Make(handlers.HandleListTeams(
+		r.Get("/teams", handlers.HandleListTeams(
 			dbAccess.TeamStore,
-		)))
+		))
 
-		r.Post("/teams", handlers.Make(handlers.HandleCreateTeam(
+		r.Post("/teams", handlers.HandleCreateTeam(
 			dbAccess.TeamStore,
-		)))
+		))
 	})
 	// slog.Info("HTTP server started", "listenAddr", cfg.Port)
 	// http.ListenAndServe(cfg.Port, router)

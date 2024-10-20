@@ -2324,6 +2324,10 @@ html {
   margin-bottom: 0.25rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-2\.5 {
   margin-bottom: 0.625rem;
 }
@@ -2344,10 +2348,6 @@ html {
   margin-top: 2rem;
 }
 
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-
 .block {
   display: block;
 }
@@ -2362,10 +2362,6 @@ html {
 
 .grid {
   display: grid;
-}
-
-.contents {
-  display: contents;
 }
 
 .hidden {
@@ -2466,10 +2462,6 @@ html {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.flex-row {
-  flex-direction: row;
 }
 
 .flex-col {
@@ -3079,12 +3071,12 @@ html {
 }
 
 @media (min-width: 1280px) {
-  .xl\:p-5 {
-    padding: 1.25rem;
-  }
-
   .xl\:p-2 {
     padding: 0.5rem;
+  }
+
+  .xl\:p-5 {
+    padding: 1.25rem;
   }
 }
 

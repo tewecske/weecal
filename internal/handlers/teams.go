@@ -7,18 +7,20 @@ import (
 	"strings"
 	"weecal/internal/store/team"
 	"weecal/web/templates"
+
+	"github.com/a-h/templ"
 )
 
-func HandleListTeams(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+func HandleListTeams(teamStore team.TeamStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teams, err := teamStore.ListTeams()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			Render(w, r, templates.TeamsError(), "Teams Error")
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
 			return
 		}
 
-		Render(w, r, templates.ListTeams(teams), "Teams")
+		templ.Handler(templates.ListTeams(teams)).ServeHTTP(w, r)
 	}
 }
 
@@ -26,13 +28,9 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hxRequest := r.Header.Get("HX-Request")
 		if hxRequest == "true" {
-			err := templates.CreateTeamComponent().Render(r.Context(), w)
-			if err != nil {
-				http.Error(w, "Error rendering template", http.StatusInternalServerError)
-				return
-			}
+			templ.Handler(templates.CreateTeamComponent()).ServeHTTP(w, r)
 		} else {
-			Render(w, r, templates.CreateTeam(), "Teams")
+			templ.Handler(templates.CreateTeam()).ServeHTTP(w, r)
 		}
 
 	}

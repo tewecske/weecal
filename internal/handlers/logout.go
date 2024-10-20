@@ -7,7 +7,7 @@ import (
 
 func HandlePostLogout(
 	sessionCookieName string,
-) func(w http.ResponseWriter, r *http.Request) {
+) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{

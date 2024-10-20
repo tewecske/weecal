@@ -10,10 +10,12 @@ import (
 	"weecal/internal/store/session"
 	"weecal/internal/store/user"
 	"weecal/web/templates"
+
+	"github.com/a-h/templ"
 )
 
-func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	Render(w, r, templates.Login(), "Login")
+func HandleLogin() http.HandlerFunc {
+	return templ.Handler(templates.Login()).ServeHTTP
 }
 
 func HandlePostLogin(
@@ -21,7 +23,7 @@ func HandlePostLogin(
 	sessionStore session.SessionStore,
 	passwordHash hash.PasswordHash,
 	sessionCookieName string,
-) func(w http.ResponseWriter, r *http.Request) {
+) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 

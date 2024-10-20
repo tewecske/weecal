@@ -3,11 +3,12 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"time"
 	"weecal/web/templates"
+
+	"github.com/a-h/templ"
 )
 
-func HandleCalendar(w http.ResponseWriter, r *http.Request) {
+func HandleCalendar() http.HandlerFunc {
 	days := []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}
 
 	hours := []string{}
@@ -15,9 +16,5 @@ func HandleCalendar(w http.ResponseWriter, r *http.Request) {
 		hours = append(hours, fmt.Sprintf("%02d:00", hour))
 	}
 
-	Render(w, r, templates.Calendar(days, hours), "Calendar")
-}
-
-func Date(i1, i2, i3, i4, i5, i6, i7, i8 int, tz *time.Location) {
-	panic("unimplemented")
+	return templ.Handler(templates.Calendar(days, hours)).ServeHTTP
 }

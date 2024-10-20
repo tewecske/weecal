@@ -96,14 +96,18 @@ templ teamLayout() {
 }
 
 templ ListTeams(teams []team.Team) {
-	@teamLayout() {
-		@listTeamsComponent(teams)
+	@Layout("Teams") {
+		@teamLayout() {
+			@listTeamsComponent(teams)
+		}
 	}
 }
 
 templ CreateTeam() {
-	@teamLayout() {
-		@CreateTeamComponent()
+	@Layout("Teams") {
+		@teamLayout() {
+			@CreateTeamComponent()
+		}
 	}
 }
 
@@ -136,5 +140,7 @@ templ CreateTeamComponent() {
 }
 
 templ TeamsError() {
-	<p class=" text-error">Teams error</p>
+	@Layout("Teams error") {
+		<p class=" text-error">Teams error</p>
+	}
 }

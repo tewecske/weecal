@@ -1,7 +1,9 @@
 package templates
 
 templ Index() {
-<div class="container flex justify-items-center mx-auto">
-    <div class="mx-auto text-center mt-10">This is the HOME</div>
-</div>
+	@Layout("Home") {
+		<div class="container flex justify-items-center mx-auto">
+			<div class="mx-auto text-center mt-10">This is the HOME</div>
+		</div>
+	}
 }
