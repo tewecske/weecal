@@ -16,4 +16,5 @@ type TeamStore interface {
 	CreateTeam(team Team) error
 	ListTeams() ([]Team, error)
 	ReadTeam(id string) (Team, error)
+	DeleteTeam(id string) error
 }

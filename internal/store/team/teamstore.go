@@ -67,7 +67,7 @@ func (s *SQLTeamStore) ReadTeam(id string) (Team, error) {
 	})
 
 	if err != nil {
-		slog.Info("Error reading teams", "err", err, "id", id)
+		slog.Info("Error reading team", "err", err, "id", id)
 		return team, err
 	}
 	if rows.Next() {
@@ -77,4 +77,22 @@ func (s *SQLTeamStore) ReadTeam(id string) (Team, error) {
 		return team, nil
 	}
 	return team, errors.New(fmt.Sprintf("Error reading team with id: %s", id))
+}
+
+func (s *SQLTeamStore) DeleteTeam(id string) error {
+	result, err := s.db.NamedExec(`DELETE FROM teams WHERE id=:id;`, map[string]interface{}{
+		"id": id,
+	})
+
+	if err != nil {
+		slog.Info("Error deleting team", "err", err, "id", id)
+		return err
+	}
+
+	if rows, _ := result.RowsAffected(); rows < 1 {
+		slog.Info("Error deleting team, not found", "id", id)
+		return errors.New(fmt.Sprintf("Error deleting team with id: %s, not found", id))
+	}
+
+	return nil
 }

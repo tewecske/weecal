@@ -120,6 +120,10 @@ func main() {
 			dbAccess.TeamStore,
 		))
 
+		r.Delete("/teams/{id}", handlers.HandleDeleteTeam(
+			dbAccess.TeamStore,
+		))
+
 		r.Post("/teams", handlers.HandleCreateTeam(
 			dbAccess.TeamStore,
 		))

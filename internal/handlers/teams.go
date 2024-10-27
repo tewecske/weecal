@@ -55,6 +55,22 @@ func HandleViewTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *htt
 	}
 }
 
+func HandleDeleteTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		teamId := chi.URLParam(r, "id")
+		slog.Info("HandleDeleteTeam", "teamId", teamId)
+		err := teamStore.DeleteTeam(teamId)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("HX-Redirect", "/teams")
+		w.WriteHeader(http.StatusOK)
+
+	}
+}
+
 func validateCreateTeam(teamForm team.TeamForm) map[string]string {
 	validationErrors := map[string]string{}
 	if teamForm.Name == "" {

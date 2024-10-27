@@ -75,9 +75,9 @@ templ listTeamsComponent(teams []team.Team) {
 						>Modify</button>
 						<button
 							class="btn btn-sm"
-							hx-get={ "/teams/" + fmt.Sprint(team.ID) + "/delete" }
-							hx-target="#modal"
+							hx-delete={ "/teams/" + fmt.Sprint(team.ID) }
 							hx-trigger="click"
+							hx-confirm={ fmt.Sprintf("Are you sure you want to delete team %s?", team.Name) }
 						>Delete</button>
 					</td>
 				</tr>
@@ -85,6 +85,26 @@ templ listTeamsComponent(teams []team.Team) {
 		</tbody>
 	</table>
 	<dialog id="viewTeamModal"></dialog>
+	<dialog id="deleteModal" class="modal">
+		<div class="modal-box px-4 my-32 max-w-sm mx-auto space-y-6">
+			<div class="w-full">
+				<p id="confirmDeleteMessage">Are you sure you want to delete?</p>
+			</div>
+			<form method="dialog" class="w-full flex space-x-4">
+				<div class="w-1/2">
+					<button id="cancelDeleteButton" class="btn block w-full">Cancel</button>
+				</div>
+				<div class="w-1/2">
+					<button
+						id="confirmDeleteButton"
+						class="btn block w-full"
+						hx-delete={ "/teams/" }
+						hx-trigger="click"
+					>Delete</button>
+				</div>
+			</form>
+		</div>
+	</dialog>
 }
 
 templ teamLayout() {
@@ -175,13 +195,11 @@ templ ViewTeamComponent(team team.Team) {
 				<p class="font-bold">Short Name</p>
 				<p>{ team.ShortName }</p>
 			</div>
-			<div class="w-full flex space-x-4">
-				<form method="dialog">
-					<div class="w-full">
-						<button class="btn block w-full">Close</button>
-					</div>
-				</form>
-			</div>
+			<form method="dialog" class="w-full flex space-x-4">
+				<div class="w-full">
+					<button class="btn block w-full">Close</button>
+				</div>
+			</form>
 		</div>
 	</dialog>
 }

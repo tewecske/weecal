@@ -30,3 +30,36 @@ htmx.on("htmx:load", function(evt) {
     });
   }
 });
+
+async function confirmation(e) {
+  const messageElement = document.querySelector("#deleteModal #confirmDeleteMessage");
+  messageElement.innerHTML = e.detail.question;
+  const confirmDeleteButton = document.querySelector("#deleteModal #confirmDeleteButton");
+  const cancelDeleteButton = document.querySelector("#deleteModal #cancelDeleteButton");
+
+  const promise = await new Promise((resolve, reject) => {
+    deleteModal.showModal();
+
+    confirmDeleteButton.addEventListener("click", () => {
+      resolve(true);
+    });
+
+    cancelDeleteButton.addEventListener("click", () => {
+      resolve(false);
+    });
+  });
+
+  if (promise) {
+    e.detail.issueRequest(true);
+  }
+}
+
+document.addEventListener("htmx:confirm", function(e) {
+  if (!e.detail.target.hasAttribute('hx-confirm')) return
+
+  e.preventDefault();
+
+  confirmation(e);
+
+});
+
