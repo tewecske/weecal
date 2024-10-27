@@ -38,6 +38,11 @@ func main() {
 		UserID: 1,
 	})
 	dbAccess.TeamStore.CreateTeam(team.Team{ID: 1, Name: "U10 2010", ShortName: "U10"})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 2, Name: "U11 2009", ShortName: "U11"})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 3, Name: "U12 2008", ShortName: "U12"})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 4, Name: "U13 2007", ShortName: "U13"})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 5, Name: "U14 2006", ShortName: "U14"})
+	dbAccess.TeamStore.CreateTeam(team.Team{ID: 6, Name: "U15 2005", ShortName: "U15"})
 
 	// TODO: Check: base-uri 'none'; object-src 'none';
 	// TODO: Check: script-src 'strict-dynamic' 'unsafe-inline' 'unsafe-eval'

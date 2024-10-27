@@ -45,7 +45,7 @@ templ listTeamsComponent(teams []team.Team) {
 		</thead>
 		<tbody id="teams-table-body">
 			for _, team := range teams {
-				<tr class="bg-base-100">
+				<tr id={ "row-" + fmt.Sprint(team.ID) } class="bg-base-100">
 					<td
 						class="relative h-10 border border-stroke items-center justify-center dark:border-strokedark md:h-15 xl:h-21"
 					>
@@ -77,6 +77,8 @@ templ listTeamsComponent(teams []team.Team) {
 							class="btn btn-sm"
 							hx-delete={ "/teams/" + fmt.Sprint(team.ID) }
 							hx-trigger="click"
+							hx-target={ "#row-" + fmt.Sprint(team.ID) }
+							hx-swap="outerHTML"
 							hx-confirm={ fmt.Sprintf("Are you sure you want to delete team %s?", team.Name) }
 						>Delete</button>
 					</td>
@@ -98,8 +100,6 @@ templ listTeamsComponent(teams []team.Team) {
 					<button
 						id="confirmDeleteButton"
 						class="btn block w-full"
-						hx-delete={ "/teams/" }
-						hx-trigger="click"
 					>Delete</button>
 				</div>
 			</form>

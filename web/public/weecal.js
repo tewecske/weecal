@@ -55,7 +55,8 @@ async function confirmation(e) {
 }
 
 document.addEventListener("htmx:confirm", function(e) {
-  if (!e.detail.target.hasAttribute('hx-confirm')) return
+  console.log("htmx:confirm", e);
+  if (e.detail.question === undefined || e.detail.question === null || e.detail.question === "") return
 
   e.preventDefault();
 

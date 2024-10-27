@@ -65,7 +65,7 @@ func HandleDeleteTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
 			return
 		}
-		w.Header().Set("HX-Redirect", "/teams")
+		// w.Header().Set("HX-Redirect", "/teams")
 		w.WriteHeader(http.StatusOK)
 
 	}
