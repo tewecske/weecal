@@ -70,8 +70,10 @@ templ listTeamsComponent(teams []team.Team) {
 						<button
 							class="btn btn-sm"
 							hx-get={ "/teams/" + fmt.Sprint(team.ID) + "/edit" }
-							hx-target="#modal"
+							hx-target="#teams-content"
+							hx-swap="innerHTML"
 							hx-trigger="click"
+							hx-push-url="true"
 						>Modify</button>
 						<button
 							class="btn btn-sm"
@@ -162,6 +164,62 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 			<div class="w-full flex space-x-4">
 				<div class="w-1/2">
 					<button type="submit" class="btn block w-full">Create</button>
+				</div>
+				<div class="w-1/2">
+					<button
+						hx-get="/teams"
+						hx-target="#teams-container"
+						hx-select="#teams-container"
+						class="btn block w-full"
+					>Cancel</button>
+				</div>
+			</div>
+		</form>
+	</div>
+}
+
+templ UpdateTeam(teamForm team.TeamForm, validationErrors map[string]string) {
+	@Layout("Teams") {
+		@teamLayout() {
+			@UpdateTeamComponent(teamForm, validationErrors)
+		}
+	}
+}
+
+templ UpdateTeamComponent(teamForm team.TeamForm, validationErrors map[string]string) {
+	<div id="create-team" class="">
+		<form hx-put={ "/teams/" + fmt.Sprint(teamForm.ID) } class="px-4 my-32 max-w-sm mx-auto space-y-6">
+			<div class="w-full">
+				@components.Input(components.InputParams{
+					ID:          "name",
+					Name:        "name",
+					Label:       "Name",
+					InputType:   "text",
+					Placeholder: "Name",
+					Value:       teamForm.Name,
+					Error:       components.ErrorForField(validationErrors, "name"),
+				})
+			</div>
+			<div class="w-full">
+				@components.Input(components.InputParams{
+					ID:          "shortName",
+					Name:        "shortName",
+					Label:       "Short Name",
+					InputType:   "text",
+					Placeholder: "Short Name",
+					Value:       teamForm.ShortName,
+					Error:       components.ErrorForField(validationErrors, "shortName"),
+				})
+			</div>
+			if components.ErrorForField(validationErrors, "globalError") != "" {
+				<p id="global-error" class="text-red-500">{ components.ErrorForField(validationErrors, "globalError") }</p>
+			}
+			<div class="w-full flex space-x-4">
+				<div class="w-1/2">
+					<button
+						type="submit"
+						class="btn block w-full"
+					>Update</button>
 				</div>
 				<div class="w-1/2">
 					<button

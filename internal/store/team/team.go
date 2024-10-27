@@ -12,9 +12,18 @@ type TeamForm struct {
 	ShortName string `json:"shortName"`
 }
 
+func NewTeamForm(team Team) TeamForm {
+	return TeamForm{
+		ID:        team.ID,
+		Name:      team.Name,
+		ShortName: team.ShortName,
+	}
+}
+
 type TeamStore interface {
 	CreateTeam(team Team) error
 	ListTeams() ([]Team, error)
-	ReadTeam(id string) (Team, error)
-	DeleteTeam(id string) error
+	ReadTeam(id int) (Team, error)
+	DeleteTeam(id int) error
+	UpdateTeam(team Team) error
 }

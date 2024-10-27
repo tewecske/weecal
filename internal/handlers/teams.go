@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"weecal/internal/store/team"
 	"weecal/web/templates"
 
@@ -35,9 +37,83 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleViewTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+func HandleUpdateTeamView(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teamId := chi.URLParam(r, "id")
+		slog.Info("HandleUpdateTeam", "teamId", teamId)
+		teamData, err := teamStore.ReadTeam(teamId)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
+		hxRequest := r.Header.Get("HX-Request")
+		if hxRequest == "true" {
+			templ.Handler(templates.UpdateTeamComponent(team.NewTeamForm(teamData), map[string]string{})).ServeHTTP(w, r)
+		} else {
+			templ.Handler(templates.UpdateTeam(team.NewTeamForm(teamData), map[string]string{})).ServeHTTP(w, r)
+		}
+	}
+}
+
+func validateUpdateTeam(teamForm team.TeamForm) map[string]string {
+	validationErrors := map[string]string{}
+	if teamForm.Name == "" {
+		validationErrors["name"] = "Missing Name"
+	}
+	if teamForm.ShortName == "" {
+		validationErrors["shortName"] = "Missing Short Name"
+	}
+	return validationErrors
+}
+
+func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		teamForm := team.TeamForm{
+			Name:      r.FormValue("name"),
+			ShortName: r.FormValue("shortName"),
+		}
+		pathId := r.PathValue("id")
+		id, err := strconv.Atoi(pathId)
+		if err != nil {
+			templ.Handler(templates.UpdateTeamComponent(teamForm,
+				map[string]string{"globalError": fmt.Sprintf("Team not found with id: %s", pathId)})).ServeHTTP(w, r)
+			return
+		}
+		teamForm.ID = id
+		validationErrors := validateUpdateTeam(teamForm)
+		if len(validationErrors) != 0 {
+			templ.Handler(templates.UpdateTeamComponent(teamForm, validationErrors)).ServeHTTP(w, r)
+			return
+		}
+
+		team := team.Team{
+			ID:        teamForm.ID,
+			Name:      teamForm.Name,
+			ShortName: teamForm.ShortName,
+		}
+
+		slog.Info("Decoded team from request", "team", team)
+		err = teamStore.UpdateTeam(team)
+		if err != nil {
+			http.Error(w, "Error creating team", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("HX-Redirect", "/teams")
+		w.WriteHeader(http.StatusOK)
+	}
+}
+func HandleViewTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		paramId := chi.URLParam(r, "id")
+		teamId, err := strconv.Atoi(paramId)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
 		slog.Info("HandleViewTeam", "teamId", teamId)
 		team, err := teamStore.ReadTeam(teamId)
 		if err != nil {
@@ -57,9 +133,15 @@ func HandleViewTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *htt
 
 func HandleDeleteTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		teamId := chi.URLParam(r, "id")
+		paramId := chi.URLParam(r, "id")
+		teamId, err := strconv.Atoi(paramId)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
 		slog.Info("HandleDeleteTeam", "teamId", teamId)
-		err := teamStore.DeleteTeam(teamId)
+		err = teamStore.DeleteTeam(teamId)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)

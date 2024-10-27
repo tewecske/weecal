@@ -55,7 +55,7 @@ type Hooks struct{}
 
 // Before hook will print the query with it's args and return the context with the timestamp
 func (h *Hooks) Before(ctx context.Context, query string, args ...interface{}) (context.Context, error) {
-	fmt.Printf("> %s %q", query, args)
+	fmt.Printf("> %s %+v", query, args)
 	return context.WithValue(ctx, "begin", time.Now()), nil
 }
 
@@ -75,6 +75,7 @@ func Connect(dbName string) *sqlx.DB {
 
 	// Connect to the registered wrapped driver
 	// db, _ := sql.Open("sqlite3WithHooks", ":memory:")
+	slog.Info("Connecting to database", "dbName", dbName)
 	db := sqlx.MustConnect("sqlite3WithHooks", dbName)
 
 	// TODO Move to parameter
