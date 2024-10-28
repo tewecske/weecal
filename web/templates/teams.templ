@@ -137,8 +137,8 @@ templ CreateTeam() {
 }
 
 templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]string) {
-	<div id="create-team" class="">
-		<form hx-post="/teams" class="px-4 my-32 max-w-sm mx-auto space-y-6">
+	<div id="create-team" class="" hx-ext="response-targets">
+		<form hx-post="/teams" hx-target-error="#any-errors" class="px-4 my-32 max-w-sm mx-auto space-y-6">
 			<div class="w-full">
 				@components.Input(components.InputParams{
 					ID:          "name",
@@ -161,6 +161,7 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 					Error:       components.ErrorForField(validationErrors, "shortName"),
 				})
 			</div>
+			<div id="any-errors" class="text-red-500"></div>
 			<div class="w-full flex space-x-4">
 				<div class="w-1/2">
 					<button type="submit" class="btn block w-full">Create</button>

@@ -5,11 +5,13 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 	"weecal/internal/store/team"
 	"weecal/web/templates"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
+	"github.com/mattn/go-sqlite3"
 )
 
 func HandleListTeams(teamStore team.TeamStore) http.HandlerFunc {
@@ -39,7 +41,13 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 
 func HandleUpdateTeamView(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		teamId := chi.URLParam(r, "id")
+		paramId := chi.URLParam(r, "id")
+		teamId, err := strconv.Atoi(paramId)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			templ.Handler(templates.TeamsError()).ServeHTTP(w, r)
+			return
+		}
 		slog.Info("HandleUpdateTeam", "teamId", teamId)
 		teamData, err := teamStore.ReadTeam(teamId)
 		if err != nil {
@@ -97,7 +105,7 @@ func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		slog.Info("Decoded team from request", "team", team)
 		err = teamStore.UpdateTeam(team)
 		if err != nil {
-			http.Error(w, "Error creating team", http.StatusInternalServerError)
+			http.Error(w, "Error updating team", http.StatusInternalServerError)
 			return
 		}
 
@@ -164,6 +172,30 @@ func validateCreateTeam(teamForm team.TeamForm) map[string]string {
 	return validationErrors
 }
 
+func teamError(w http.ResponseWriter, err error) {
+	fmt.Printf("DEBUGGING error %T %s\n", err, err)
+	if sqerr, ok := err.(sqlite3.Error); ok {
+		slog.Info("sqlite3 error", "sqerr", sqerr)
+		fmt.Printf("sqlite3 error: %#v\n", sqerr)
+		// sqlite3 error: sqlite3.Error{Code:19, ExtendedCode:2067, SystemErrno:0x0, err:"UNIQUE constraint failed: teams.short_name"}
+		switch sqerr.Code {
+		case 19:
+			switch sqerr.ExtendedCode {
+			case 2067:
+				words := strings.Fields(sqerr.Error())
+				fieldName := words[len(words)-1]
+				// TODO: retarget for proper field
+				w.Header().Set("HX-Retarget", "#shortNameError")
+				http.Error(w, fmt.Sprintf("Duplicate %s!", fieldName), http.StatusBadRequest)
+			default:
+				http.Error(w, "Error!", http.StatusInternalServerError)
+			}
+		default:
+			http.Error(w, "Error!", http.StatusInternalServerError)
+		}
+	}
+}
+
 func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -185,7 +217,7 @@ func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		slog.Info("Decoded team from request", "team", team)
 		err := teamStore.CreateTeam(team)
 		if err != nil {
-			http.Error(w, "Error creating team", http.StatusInternalServerError)
+			teamError(w, err)
 			return
 		}
 
