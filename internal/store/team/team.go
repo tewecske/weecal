@@ -4,12 +4,15 @@ type Team struct {
 	ID        int    `db:"id" json:"id"`
 	Name      string `db:"name" json:"name"`
 	ShortName string `db:"short_name" json:"shortName"`
+	CreatedAt string `db:"created_at" json:"createdAt"`
+	UpdatedAt string `db:"updated_at" json:"updatedAt"`
 }
 
 type TeamForm struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	ShortName string `json:"shortName"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 func NewTeamForm(team Team) TeamForm {
@@ -17,6 +20,7 @@ func NewTeamForm(team Team) TeamForm {
 		ID:        team.ID,
 		Name:      team.Name,
 		ShortName: team.ShortName,
+		UpdatedAt: team.UpdatedAt,
 	}
 }
 

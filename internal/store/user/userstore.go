@@ -1,8 +1,8 @@
 package user
 
 import (
-	"weecal/internal/hash"
 	"log/slog"
+	"weecal/internal/hash"
 
 	"github.com/jmoiron/sqlx"
 )

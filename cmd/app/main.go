@@ -43,7 +43,9 @@ func main() {
 	dbAccess.TeamStore.CreateTeam(team.Team{ID: 4, Name: "U13 2007", ShortName: "U13"})
 	dbAccess.TeamStore.CreateTeam(team.Team{ID: 5, Name: "U14 2006", ShortName: "U14"})
 	dbAccess.TeamStore.CreateTeam(team.Team{ID: 6, Name: "U15 2005", ShortName: "U15"})
-	dbAccess.TeamStore.UpdateTeam(team.Team{ID: 6, Name: "U15 2005xa", ShortName: "U15"})
+	team6, _ := dbAccess.TeamStore.ReadTeam(6)
+	team6.Name = "U15 2005xx"
+	dbAccess.TeamStore.UpdateTeam(team6)
 
 	// TODO: Check: base-uri 'none'; object-src 'none';
 	// TODO: Check: script-src 'strict-dynamic' 'unsafe-inline' 'unsafe-eval'

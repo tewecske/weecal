@@ -212,6 +212,7 @@ templ UpdateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 					Error:       components.ErrorForField(validationErrors, "shortName"),
 				})
 			</div>
+			<input type="hidden" name="updatedAt" value={ teamForm.UpdatedAt }/>
 			if components.ErrorForField(validationErrors, "globalError") != "" {
 				<p id="global-error" class="text-red-500">{ components.ErrorForField(validationErrors, "globalError") }</p>
 			}
@@ -225,6 +226,7 @@ templ UpdateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 				<div class="w-1/2">
 					<button
 						hx-get="/teams"
+						hx-push-url="true"
 						hx-target="#teams-container"
 						hx-select="#teams-container"
 						class="btn block w-full"

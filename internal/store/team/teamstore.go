@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"weecal/internal/store/utils"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -12,7 +13,9 @@ const TeamSchema = `
 CREATE TABLE teams (
 	id INTEGER PRIMARY KEY,
 	name TEXT UNIQUE NOT NULL,
-	short_name TEXT UNIQUE NOT NULL
+	short_name TEXT UNIQUE NOT NULL,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL
 );`
 
 type SQLTeamStore struct {
@@ -63,7 +66,8 @@ func (s *SQLTeamStore) CreateTeam(team Team) error {
 		return err
 	}
 
-	result, err := tx.NamedExec(`INSERT INTO teams (name, short_name) VALUES (:name, :short_name);`, team)
+	result, err := tx.NamedExec(`INSERT INTO teams (name, short_name, created_at, updated_at)
+		VALUES (:name, :short_name, `+utils.DateTimeFormat+`, `+utils.DateTimeFormat+`);`, team)
 
 	if err != nil {
 		slog.Info("Error creating team", "err", err)
@@ -90,7 +94,7 @@ func (s *SQLTeamStore) UpdateTeam(team Team) error {
 		return err
 	}
 
-	result, err := tx.NamedExec(`UPDATE teams SET name=:name, short_name=:short_name WHERE id=:id;`, team)
+	result, err := tx.NamedExec(`UPDATE teams SET name=:name, short_name=:short_name, updated_at=`+utils.DateTimeFormat+` WHERE id=:id AND updated_at=:updated_at;`, team)
 
 	if err != nil {
 		slog.Info("Error updating team", "err", err)
@@ -98,9 +102,15 @@ func (s *SQLTeamStore) UpdateTeam(team Team) error {
 		return err
 	}
 	if rows, _ := result.RowsAffected(); rows < 1 {
-		slog.Info("Error updating team, not found", "id", team.ID)
 		_ = tx.Rollback()
-		return errors.New(fmt.Sprintf("Error updating team with id: %d, not found", team.ID))
+		rereadTeam, err := s.ReadTeam(team.ID)
+		if err != nil {
+			slog.Info("Error updating team, not found", "id", rereadTeam.ID, "err", err)
+		}
+		if rereadTeam.UpdatedAt != team.UpdatedAt {
+			slog.Info("Error updating team, already updated", "id", rereadTeam.ID, "err", err, "team.UpdatedAt", team.UpdatedAt, "rereadTeam.UpdatedAt", rereadTeam.UpdatedAt)
+		}
+		return errors.New(fmt.Sprintf("Error updating team with id: %d, not found or updated", team.ID))
 	}
 
 	err = tx.Commit()
@@ -114,6 +124,7 @@ func (s *SQLTeamStore) UpdateTeam(team Team) error {
 	return nil
 }
 
+// TODO: pass in team reference instead and return that
 func (s *SQLTeamStore) ReadTeam(id int) (Team, error) {
 	team := Team{
 		ID: id,
@@ -125,9 +136,10 @@ func (s *SQLTeamStore) ReadTeam(id int) (Team, error) {
 		return team, err
 	}
 
-	stmt, err := tx.PrepareNamed(`SELECT id, name, short_name FROM teams WHERE id=:id;`)
+	stmt, err := tx.PrepareNamed(`SELECT id, name, short_name, created_at, updated_at FROM teams WHERE id=:id;`)
 	if err != nil {
 		slog.Info("Error creating prepared statement to read team", "err", err, "id", id)
+		_ = tx.Rollback()
 		return team, err
 	}
 	defer stmt.Close()
@@ -136,9 +148,17 @@ func (s *SQLTeamStore) ReadTeam(id int) (Team, error) {
 
 	if err != nil {
 		slog.Info("Error reading team", "err", err, "id", id)
+		_ = tx.Rollback()
 		return team, err
 	}
-	return team, errors.New(fmt.Sprintf("Error reading team with id: %d", id))
+
+	err = tx.Commit()
+	if err != nil {
+		slog.Info("Error committing transaction", "err", err)
+		return team, err
+	}
+
+	return team, nil
 }
 
 func (s *SQLTeamStore) DeleteTeam(id int) error {

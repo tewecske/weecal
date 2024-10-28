@@ -81,6 +81,7 @@ func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		teamForm := team.TeamForm{
 			Name:      r.FormValue("name"),
 			ShortName: r.FormValue("shortName"),
+			UpdatedAt: r.FormValue("updatedAt"),
 		}
 		pathId := r.PathValue("id")
 		id, err := strconv.Atoi(pathId)
@@ -100,6 +101,7 @@ func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 			ID:        teamForm.ID,
 			Name:      teamForm.Name,
 			ShortName: teamForm.ShortName,
+			UpdatedAt: teamForm.UpdatedAt,
 		}
 
 		slog.Info("Decoded team from request", "team", team)
@@ -193,6 +195,9 @@ func teamError(w http.ResponseWriter, err error) {
 		default:
 			http.Error(w, "Error!", http.StatusInternalServerError)
 		}
+	} else {
+		slog.Error("Unknown error!", "err", err)
+		http.Error(w, "Error!", http.StatusInternalServerError)
 	}
 }
 
