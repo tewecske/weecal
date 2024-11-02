@@ -12,7 +12,8 @@ import (
 var publicFS embed.FS
 
 func Public() http.Handler {
-	return http.FileServerFS(publicFS)
+	// return http.FileServerFS(publicFS)
+	return http.StripPrefix("/public/", http.FileServerFS(publicFS))
 }
 
 const IsDevelopment = false

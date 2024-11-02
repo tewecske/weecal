@@ -1,9 +1,0 @@
-<label for=\"
-\">
-</label> <input type=\"text\" name=\"
-\" placeholder=\"
-\" class=\"input input-bordered block w-full\" value=\"
-\"> 
-<p id=\"
-\" class=\"text-red-500\">
-</p>
