@@ -5,15 +5,20 @@ package project
 
 import (
 	"embed"
+	"io/fs"
 	"net/http"
 )
 
-//go:embed web/public
+//go:embed web/public/*
 var publicFS embed.FS
 
 func Public() http.Handler {
-	// return http.FileServerFS(publicFS)
-	return http.StripPrefix("/public/", http.FileServerFS(publicFS))
+	fsys, err := fs.Sub(publicFS, "web/public")
+	if err != nil {
+		panic(err)
+	}
+
+	return http.StripPrefix("/public/", http.FileServer(http.FS(fsys)))
 }
 
 const IsDevelopment = false
