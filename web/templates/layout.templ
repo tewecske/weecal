@@ -141,12 +141,6 @@ templ hero(title string) {
 	</section>
 }
 
-templ footer() {
-	<footer class="footer footer-center bg-neutral mt-8">
-		<h2 class="font-bold text-xl">Footer</h2>
-	</footer>
-}
-
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en" data-theme="aqua" class="scrollbar-thumb-base-200 scrollbar-track-base-100">
@@ -157,7 +151,6 @@ templ Layout(title string) {
 			<main class="">
 				{ children... }
 			</main>
-			@footer()
 		</body>
 	</html>
 }
