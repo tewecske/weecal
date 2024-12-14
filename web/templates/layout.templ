@@ -145,7 +145,7 @@ templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en" data-theme="aqua" class="scrollbar-thumb-base-200 scrollbar-track-base-100">
 		@header(title)
-		<body class="min-h-screen flex flex-col">
+		<body class="min-h-screen flex flex-col" hx-ext="response-targets">
 			@nav()
 			@hero(title)
 			<main class="">

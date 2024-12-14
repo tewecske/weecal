@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 	"weecal/internal/store/team"
@@ -33,7 +35,7 @@ func HandleCreateTeamView() func(w http.ResponseWriter, r *http.Request) {
 		if hxRequest == "true" {
 			templ.Handler(templates.CreateTeamComponent(team.TeamForm{}, map[string]string{})).ServeHTTP(w, r)
 		} else {
-			templ.Handler(templates.CreateTeam()).ServeHTTP(w, r)
+			templ.Handler(templates.CreateTeam(team.TeamForm{}, map[string]string{})).ServeHTTP(w, r)
 		}
 
 	}
@@ -93,6 +95,8 @@ func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		teamForm.ID = id
 		validationErrors := validateUpdateTeam(teamForm)
 		if len(validationErrors) != 0 {
+			w.Header().Set("HX-Reswap", "outerHTML")
+			w.WriteHeader(http.StatusBadRequest)
 			templ.Handler(templates.UpdateTeamComponent(teamForm, validationErrors)).ServeHTTP(w, r)
 			return
 		}
@@ -107,7 +111,10 @@ func HandleUpdateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		slog.Info("Decoded team from request", "team", team)
 		err = teamStore.UpdateTeam(team)
 		if err != nil {
-			http.Error(w, "Error updating team", http.StatusInternalServerError)
+			w.Header().Set("HX-Reswap", "outerHTML")
+			w.WriteHeader(http.StatusConflict)
+			templ.Handler(templates.UpdateTeamComponent(teamForm,
+				map[string]string{"globalError": fmt.Sprintf("Team with id: %s was already updated!", pathId)})).ServeHTTP(w, r)
 			return
 		}
 
@@ -174,21 +181,39 @@ func validateCreateTeam(teamForm team.TeamForm) map[string]string {
 	return validationErrors
 }
 
-func teamError(w http.ResponseWriter, err error) {
-	fmt.Printf("DEBUGGING error %T %s\n", err, err)
+func fieldFromColumn(s any, f string) (string, error) {
+	t := reflect.TypeOf(s)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag
+		db := tag.Get("db")
+		if db == f {
+			return field.Name, nil
+		}
+	}
+	return "", errors.New(fmt.Sprintf("Invalid field: %s", f))
+}
+func teamError(w http.ResponseWriter, err error) (map[string]string, error) {
 	if sqerr, ok := err.(sqlite3.Error); ok {
 		slog.Info("sqlite3 error", "sqerr", sqerr)
-		fmt.Printf("sqlite3 error: %#v\n", sqerr)
 		// sqlite3 error: sqlite3.Error{Code:19, ExtendedCode:2067, SystemErrno:0x0, err:"UNIQUE constraint failed: teams.short_name"}
 		switch sqerr.Code {
 		case 19:
 			switch sqerr.ExtendedCode {
 			case 2067:
-				words := strings.Fields(sqerr.Error())
-				fieldName := words[len(words)-1]
+				words := strings.Split(sqerr.Error(), ".")
+				columnName := words[len(words)-1]
+				slog.Info("column", "columnName", columnName)
+				fieldName, ferr := fieldFromColumn(team.Team{}, columnName)
+				fieldName = strings.ToLower(fieldName[:1]) + fieldName[1:]
+				slog.Info("field", "fieldName", fieldName)
+				if ferr != nil {
+					http.Error(w, "Error!", http.StatusInternalServerError)
+				}
 				// TODO: retarget for proper field
-				w.Header().Set("HX-Retarget", "#shortNameError")
-				http.Error(w, fmt.Sprintf("Duplicate %s!", fieldName), http.StatusBadRequest)
+				validationErrors := map[string]string{}
+				validationErrors[fieldName] = fmt.Sprintf("Duplicate %s!", fieldName)
+				return validationErrors, nil
 			default:
 				http.Error(w, "Error!", http.StatusInternalServerError)
 			}
@@ -199,6 +224,7 @@ func teamError(w http.ResponseWriter, err error) {
 		slog.Error("Unknown error!", "err", err)
 		http.Error(w, "Error!", http.StatusInternalServerError)
 	}
+	return nil, errors.New("Error!")
 }
 
 func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *http.Request) {
@@ -210,6 +236,8 @@ func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		}
 		validationErrors := validateCreateTeam(teamForm)
 		if len(validationErrors) != 0 {
+			w.Header().Set("HX-Reswap", "outerHTML")
+			w.WriteHeader(http.StatusBadRequest)
 			templ.Handler(templates.CreateTeamComponent(teamForm, validationErrors)).ServeHTTP(w, r)
 			return
 		}
@@ -222,7 +250,11 @@ func HandleCreateTeam(teamStore team.TeamStore) func(w http.ResponseWriter, r *h
 		slog.Info("Decoded team from request", "team", team)
 		err := teamStore.CreateTeam(team)
 		if err != nil {
-			teamError(w, err)
+			validationErrors, _ = teamError(w, err)
+			slog.Info("Validation errors", "validationErrors", validationErrors)
+			w.Header().Set("HX-Reswap", "outerHTML")
+			w.WriteHeader(http.StatusBadRequest)
+			templ.Handler(templates.CreateTeamComponent(teamForm, validationErrors)).ServeHTTP(w, r)
 			return
 		}
 

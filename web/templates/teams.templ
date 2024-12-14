@@ -128,17 +128,17 @@ templ ListTeams(teams []team.Team) {
 	}
 }
 
-templ CreateTeam() {
+templ CreateTeam(teamForm team.TeamForm, validationErrors map[string]string) {
 	@Layout("Teams") {
 		@teamLayout() {
-			@CreateTeamComponent(team.TeamForm{}, map[string]string{})
+			@CreateTeamComponent(teamForm, validationErrors)
 		}
 	}
 }
 
 templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]string) {
-	<div id="create-team" class="" hx-ext="response-targets">
-		<form hx-post="/teams" hx-target-error="#any-errors" class="px-4 my-32 max-w-sm mx-auto space-y-6">
+	<div id="create-team" class="">
+		<form hx-post="/teams" hx-target-4*="#create-team" class="px-4 my-32 max-w-sm mx-auto space-y-6">
 			<div class="w-full">
 				@components.Input(components.InputParams{
 					ID:          "name",
@@ -161,7 +161,9 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 					Error:       components.ErrorForField(validationErrors, "shortName"),
 				})
 			</div>
-			<div id="any-errors" class="text-red-500"></div>
+			if components.ErrorForField(validationErrors, "globalError") != "" {
+				<p id="global-error" class="text-red-500">{ components.ErrorForField(validationErrors, "globalError") }</p>
+			}
 			<div class="w-full flex space-x-4">
 				<div class="w-1/2">
 					<button type="submit" class="btn block w-full">Create</button>
@@ -169,6 +171,7 @@ templ CreateTeamComponent(teamForm team.TeamForm, validationErrors map[string]st
 				<div class="w-1/2">
 					<button
 						hx-get="/teams"
+						hx-push-url="true"
 						hx-target="#teams-container"
 						hx-select="#teams-container"
 						class="btn block w-full"
@@ -188,8 +191,8 @@ templ UpdateTeam(teamForm team.TeamForm, validationErrors map[string]string) {
 }
 
 templ UpdateTeamComponent(teamForm team.TeamForm, validationErrors map[string]string) {
-	<div id="create-team" class="">
-		<form hx-put={ "/teams/" + fmt.Sprint(teamForm.ID) } class="px-4 my-32 max-w-sm mx-auto space-y-6">
+	<div id="update-team" class="">
+		<form hx-put={ "/teams/" + fmt.Sprint(teamForm.ID) } hx-target-4*="#update-team" class="px-4 my-32 max-w-sm mx-auto space-y-6">
 			<div class="w-full">
 				@components.Input(components.InputParams{
 					ID:          "name",
